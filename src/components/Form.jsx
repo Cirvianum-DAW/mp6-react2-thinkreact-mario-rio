@@ -1,74 +1,104 @@
-import React, { useState } from "react"; // Importem React i useState de la llibreria 'react'
-import PropTypes from "prop-types"; // Importem PropTypes per a la validació de les props
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
-// Definim un component funcional anomenat Form
 function Form(props) {
-  // Definim l'estat local per a firstName, lastName i welcomeMessage
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [welcomeMessage, setWelcomeMessage] = useState("");
+  // State variables for form inputs and welcome message
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [welcomeMessage, setWelcomeMessage] = useState('');
 
-  // Definim una funció handleSubmit que s'executa quan es fa submit al formulari
+  // Function to handle form submission
   const handleSubmit = (event) => {
-    event.preventDefault(); // Evitem que la pàgina es recarregui
-    setWelcomeMessage(`Benvingut, ${firstName} ${lastName}`); // Actualitzem el missatge de benvinguda
-    props.onFormSubmit(); // Cridem la funció onFormSubmit passada com a prop
-    props.setPlacesDisponibles(props.placesActuals - 1); // Actualitzem les places disponibles
+    event.preventDefault();
+    // Call the onFormSubmit function with form data
+    props.onFormSubmit(firstName, lastName, email);
+    // Update welcome message
+    setWelcomeMessage(`Benvingut, ${firstName} ${lastName}`);
+    // Update available places
+    props.setPlacesDisponibles(props.placesActuals - 1);
+    // Clear form fields after submission
+    setFirstName('');
+    setLastName('');
+    setEmail('');
   };
 
-  // Determinem el títol del formulari basat en el valor de tipusEstudiantSelect
-  let formTitle = "";
-  if (props.tipusEstudiantSelect === "no-graduat") {
+  // Determine form title based on selected student type
+  let formTitle = '';
+  if (props.tipusEstudiantSelect === 'no-graduat') {
     formTitle = "Detalls d'estudiant no graduat";
-  } else if (props.tipusEstudiantSelect === "graduat") {
+  } else if (props.tipusEstudiantSelect === 'graduat') {
     formTitle = "Detalls d'estudiant graduat";
   }
 
-  // Retornem el JSX del component
   return (
     <div>
       <form
-        className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 max-w-md mx-auto"
-        onSubmit={handleSubmit} // Assignem la funció handleSubmit com a gestor d'events de submit
+        className="mx-auto mb-4 max-w-md rounded bg-white px-8 pb-8 pt-6 shadow-md"
+        onSubmit={handleSubmit}
       >
-        <h1 className="text-2xl font-bold mb-4">{formTitle}</h1>
-        <label className="block text-gray-700 text-sm font-bold mb-2">
+        {/* Form title */}
+        <h1 className="mb-4 text-2xl font-bold">{formTitle}</h1>
+        {/* First name input */}
+        <label className="mb-2 block text-sm font-bold text-gray-700">
           Nom:
         </label>
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="focus:shadow-outline mb-4 w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none"
           type="text"
           name="fname"
-          onChange={(e) => setFirstName(e.target.value)} // Actualitzem l'estat de firstName quan l'usuari escriu
+          value={firstName} // Controlled component: value is set to firstName state
+          onChange={(e) => setFirstName(e.target.value)} // Update firstName state on change
         />
-        <br />
-        <br />
-        <label className="block text-gray-700 text-sm font-bold mb-2">
+        {/* Last name input */}
+        <label className="mb-2 block text-sm font-bold text-gray-700">
           Cognom:
         </label>
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="focus:shadow-outline mb-4 w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none"
           type="text"
           name="lname"
-          onChange={(e) => setLastName(e.target.value)} // Actualitzem l'estat de lastName quan l'usuari escriu
+          value={lastName} // Controlled component: value is set to lastName state
+          onChange={(e) => setLastName(e.target.value)} // Update lastName state on change
         />
-        <br />
-        <br />
+        {/* Email input */}
+        <label className="mb-2 block text-sm font-bold text-gray-700">
+          Email:
+        </label>
         <input
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full focus:outline-none focus:shadow-outline"
+          className="focus:shadow-outline mb-4 w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none"
+          type="email"
+          name="email"
+          value={email} // Controlled component: value is set to email state
+          onChange={(e) => setEmail(e.target.value)} // Update email state on change
+        />
+        {/* Submit button */}
+        <input
+          className="focus:shadow-outline mb-4 w-full rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none"
           type="submit"
           value="Submit"
         />
-        <label className="block w-full text-4xl mb-4 p-2" id="studentMsg">
+        {/* Welcome message */}
+        <label className="block w-full p-2 text-4xl" id="studentMsg">
           {welcomeMessage}
         </label>
+        {/* Display available places based on selected student type */}
+        {props.tipusEstudiantSelect === 'no-graduat' && (
+          <p>
+            Places disponibles per a <b>No Graduats: {props.placesActuals}</b>
+          </p>
+        )}
+        {props.tipusEstudiantSelect === 'graduat' && (
+          <p>
+            Places disponibles per a <b>Graduats: {props.placesActuals}</b>
+          </p>
+        )}
       </form>
-      <p>Places restants: {props.placesActuals}</p>
     </div>
   );
 }
 
-// Definim les propTypes per a la validació de les props
+// PropTypes for type checking
 Form.propTypes = {
   tipusEstudiantSelect: PropTypes.string.isRequired,
   onFormSubmit: PropTypes.func.isRequired,
